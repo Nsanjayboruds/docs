@@ -2,8 +2,29 @@
 
 import {themes as prismThemes} from "prism-react-renderer";
 const path = require("path");
+const fs = require("fs");
 import {visit} from "unist-util-visit";
 const FontPreloadPlugin = require("webpack-font-preload-plugin");
+
+// Single source of truth for the "current" docs version. Update this one
+// value when cutting a new docs version -- it drives both the versioning
+// config (lastVersion/versions/onlyIncludeVersions) and docusaurus-plugin-llms's
+// docsDir, which otherwise have to be kept in sync by hand.
+const CURRENT_DOCS_VERSION = "4.0.0";
+
+// Curated "About Keploy" content (positioning, awards, links) maintained by
+// the content team. Fed into docusaurus-plugin-llms via rootContent/fullRootContent
+// instead of living in static/, because static/ files get overwritten by the
+// plugin's postBuild step when they share a filename with its generated output
+// (llms.txt / llms-full.txt) -- this was silently discarding the curated content.
+const llmsRootContent = fs.readFileSync(
+  path.join(__dirname, "content/llms-root.txt"),
+  "utf8"
+);
+const llmsFullRootContent = fs.readFileSync(
+  path.join(__dirname, "content/llms-full-root.txt"),
+  "utf8"
+);
 
 /** @type {import('@docusaurus/types').DocusaurusConfig} */
 module.exports = {
@@ -199,6 +220,22 @@ fbq('track', 'PageView');`,
       };
     },
     "docusaurus-tailwindcss-loader",
+    [
+      "docusaurus-plugin-llms",
+      {
+        docsDir: `versioned_docs/version-${CURRENT_DOCS_VERSION}`,
+        ignoreFiles: ["**/shared/**"],
+        description:
+          "Technical documentation for Keploy, an open-source AI-powered testing agent and sandboxing platform that automatically generates test cases, dependency mocks, and production-like sandboxes from real user traffic using eBPF kernel technology. Keploy keeps testing aligned with AI-driven code velocity — achieving 90% test coverage in minutes with zero code changes.",
+        rootContent: llmsRootContent,
+        fullRootContent: llmsFullRootContent,
+        generateLLMsTxt: true,
+        generateLLMsFullTxt: true,
+        generateMarkdownFiles: true,
+        preserveDirectoryStructure: false,
+        excludeImports: true,
+      },
+    ],
   ],
   themeConfig: {
     tableOfContents: {
@@ -383,9 +420,9 @@ fbq('track', 'PageView');`,
            * in `/docs/next` directory, only versioned docs.
            */
           // excludeNextVersionDocs: false,
-          lastVersion: "4.0.0",
+          lastVersion: CURRENT_DOCS_VERSION,
           versions: {
-            "4.0.0": {
+            [CURRENT_DOCS_VERSION]: {
               label: "3.0.0",
             },
             "1.0.0": {
@@ -401,7 +438,7 @@ fbq('track', 'PageView');`,
               noIndex: true,
             },
           },
-          onlyIncludeVersions: ["1.0.0", "2.0.0", "4.0.0"],
+          onlyIncludeVersions: ["1.0.0", "2.0.0", CURRENT_DOCS_VERSION],
           includeCurrentVersion: true, // excludeNextVersionDocs is now deprecated
           // // below remark plugin disabled until we can figure out why it is not transpiling to ESNext properly - swyx
           remarkPlugins: [

@@ -23,6 +23,7 @@ import useBaseUrl from "@docusaurus/useBaseUrl";
 import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
 import {useDocsVersion} from "@docusaurus/plugin-content-docs/client";
 import {KeployCloud} from "@site/src/components/KeployCloud";
+import MarkdownPageActions from "@site/src/components/MarkdownPageActions";
 
 export default function DocItem(props) {
   const {content: DocContent} = props;
@@ -126,10 +127,10 @@ export default function DocItem(props) {
   const schemaType = schemaTypeFromFrontMatter
     ? schemaTypeFromFrontMatter
     : isApi
-    ? "APIReference"
-    : isBlog
-    ? "BlogPosting"
-    : "Article";
+      ? "APIReference"
+      : isBlog
+        ? "BlogPosting"
+        : "Article";
   const authorList = toPersonList(frontMatter?.author || frontMatter?.authors);
   const maintainerList = toPersonList(frontMatter?.maintainer);
   const contributorList = toPersonList(frontMatter?.contributor);
@@ -171,6 +172,22 @@ export default function DocItem(props) {
   const isCategoryIndex =
     frontMatter?.slug === "index" || /\/category\/|\/index\/?$/.test(permalink);
   const suppressArticleSchema = isDocsRoot || isCategoryIndex;
+  // .md twins are only generated for the current (4.0.0) version's docs
+  // (docusaurus-plugin-llms docsDir points at versioned_docs/version-4.0.0),
+  // and only for real doc pages, not root/category-index pages.
+  const showMarkdownActions = isLatestVersion && !suppressArticleSchema;
+  // trailingSlash: true means every permalink ends in "/", for section
+  // landing pages AND normal pages alike -- so the permalink shape alone
+  // can't tell them apart. The doc's source file path can: docusaurus-plugin-llms
+  // writes the twin as <folder>/index.md when the source is index.md/README.md,
+  // and as <page>.md (a sibling of the built page directory) otherwise.
+  const isIndexSource = /\/(index|README)\.mdx?$/i.test(metadata?.source || "");
+  const trimmedPermalink = permalink.replace(/\/+$/, "");
+  const markdownUrl = showMarkdownActions
+    ? isIndexSource
+      ? `${trimmedPermalink}/index.md`
+      : `${trimmedPermalink}.md`
+    : null;
 
   const articleSchema =
     pageUrl && title && !suppressArticleSchema
@@ -306,6 +323,7 @@ export default function DocItem(props) {
                     <Heading as="h1">{title}</Heading>
                   </header>
                 )}
+                {markdownUrl && <MarkdownPageActions mdUrl={markdownUrl} />}
                 <MDXContent>
                   <MDXComponent />
                 </MDXContent>
