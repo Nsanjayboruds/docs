@@ -25,7 +25,7 @@ import SectionDivider from '@site/src/components/SectionDivider';
 
 ## Introduction
 
-🪄 Dive into the world of Books CRUD API and see how seamlessly Keploy integrates with [Ruby (Sinatra)](https://sinatrarb.com/) and [PostgreSQL](https://www.postgresql.org/). Buckle up, it's gonna be a fun ride! 🎢
+🪄 Dive into the world of a realistic Ruby Books API and see how seamlessly Keploy integrates with [Ruby (Sinatra)](https://sinatrarb.com/) and [PostgreSQL](https://www.postgresql.org/). This quickstart goes beyond basic CRUD, featuring search, filtering, pagination, related resources (books and reviews), and an automated traffic script to simulate a realistic testing scenario. Buckle up, it's gonna be a fun ride! 🎢
 
 <InstallReminder />
 
@@ -59,87 +59,23 @@ git clone https://github.com/Nsanjayboruds/keploy-ruby-postgresql-quickstart.git
 
 ### Lights, Camera, Record! 🎥
 
-Capture the test-cases-
+Capture the test cases using our automated traffic script. This script handles starting the application via Keploy, waiting for it to become healthy, and generating 20 realistic API calls (including search, dependent resources, and expected errors).
 
 ```bash
-keploy record -c "docker compose up --build" --container-name "ruby-books-app" --buildDelay 50
+./run-keploy.sh
 ```
 
-This will:
-
-- Start a PostgreSQL container
-- Build and start the Ruby application container
-- Initialize the database with sample data
-- Expose the API on port 8000
-
-### Verify the Setup
-
-In a new terminal, verify the container is up and responding:
-
-```bash
-curl http://localhost:8000/health
-```
-
-Expected Response:
-
-```json
-{"status": "healthy", "service": "Ruby Books API"}
-```
-
-🔥**Make some API calls**. Postman, Hoppscotch or even curl - take your pick!
-
-### Generate Testcases
-
-To generate testcases we just need to **make some API calls.**
+What this script does:
+1. Starts Keploy record mode with `docker compose up --build`
+2. Automatically finds an available port
+3. Waits for the `/health` endpoint to be ready
+4. Sends 20 diverse API calls to simulate real-world usage
+5. Gracefully stops recording once finished
 
 ![Recorded testcase example](/img/ruby_testcase.png)
 *Screenshot: Example recorded testcase captured during the quickstart.*
 
-#### 1. Get All Books
-
-```bash
-curl http://localhost:8000/books
-```
-
-#### 2. Create a New Book
-
-```bash
-curl -X POST http://localhost:8000/books \
-  -H "Content-Type: application/json" \
-  -d '{
-    "title": "The Hobbit",
-    "author": "J.R.R. Tolkien",
-    "isbn": "9780547928227",
-    "published_year": 1937
-  }'
-```
-
-#### 3. Get a Specific Book
-
-```bash
-curl http://localhost:8000/books/1
-```
-
-#### 4. Update a Book
-
-```bash
-curl -X PUT http://localhost:8000/books/1 \
-  -H "Content-Type: application/json" \
-  -d '{
-    "title": "The Great Gatsby (Updated)",
-    "author": "F. Scott Fitzgerald",
-    "isbn": "9780743273565",
-    "published_year": 1925
-  }'
-```
-
-#### 5. Delete a Book
-
-```bash
-curl -X DELETE http://localhost:8000/books/1
-```
-
-And once you are done, you can stop the recording and give yourself a pat on the back! With that simple spell, you've conjured up test cases with mocks! Explore the **keploy** directory and you'll discover your handiwork in the `tests` directory and `mocks.yml`.
+And once the script completes, give yourself a pat on the back! With that simple spell, you've conjured up a comprehensive suite of test cases with mocks! Explore the **keploy** directory and you'll discover your handiwork in the `tests` directory and `mocks.yml`.
 
 ### Stop the Running Services
 
@@ -232,18 +168,18 @@ Expected Response:
 
 ### Lights, Camera, Record! 🎥
 
-Keep the same recording session running and start making API calls.
+Keep the same recording session running and start making API calls to exercise the application.
 
-🔥**Make some API calls**. Postman, Hoppscotch or even curl - take your pick!
+🔥**Make some API calls**. Since this is a complex application, you can test various endpoints such as searching, filtering, and adding reviews!
 
 ### Generate Testcases
 
-To generate testcases we just need to **make some API calls.**
+To generate test cases, open a new terminal and make some API calls. Here is a sample scenario you can run:
 
-#### 1. Get All Books
+#### 1. Search and Filter Books
 
 ```bash
-curl http://localhost:8000/books
+curl "http://localhost:8000/books?q=the&min_year=1900&sort_by=title&order=asc"
 ```
 
 #### 2. Create a New Book
@@ -252,39 +188,44 @@ curl http://localhost:8000/books
 curl -X POST http://localhost:8000/books \
   -H "Content-Type: application/json" \
   -d '{
-    "title": "The Hobbit",
-    "author": "J.R.R. Tolkien",
-    "isbn": "9780547928227",
-    "published_year": 1937
+    "title": "Dune",
+    "author": "Frank Herbert",
+    "isbn": "9780441013593",
+    "published_year": 1965
   }'
 ```
 
-#### 3. Get a Specific Book
+#### 3. Add a Review (Dependent Resource)
 
 ```bash
-curl http://localhost:8000/books/1
-```
-
-#### 4. Update a Book
-
-```bash
-curl -X PUT http://localhost:8000/books/1 \
+# Replace '1' with the ID of the book you just created
+curl -X POST http://localhost:8000/books/1/reviews \
   -H "Content-Type: application/json" \
   -d '{
-    "title": "The Great Gatsby (Updated)",
-    "author": "F. Scott Fitzgerald",
-    "isbn": "9780743273565",
-    "published_year": 1925
+    "reviewer": "qa-team@example.com",
+    "rating": 5,
+    "comment": "Excellent world building."
   }'
 ```
 
-#### 5. Delete a Book
+#### 4. Test Analytics Endpoint
 
 ```bash
-curl -X DELETE http://localhost:8000/books/1
+curl "http://localhost:8000/analytics/books/top-rated?limit=3&min_reviews=1"
 ```
 
-And once you are done, you can stop the recording and give yourself a pat on the back! With that simple spell, you've conjured up test cases with mocks! Explore the **keploy** directory and you'll discover your handiwork in the `tests` directory and `mocks.yml`.
+#### 5. Trigger an Expected Error (Negative Test)
+
+```bash
+curl -X POST http://localhost:8000/books \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Invalid Data",
+    "published_year": "Not a year"
+  }'
+```
+
+And once you are done, you can stop the Keploy recording (Ctrl+C in the first terminal) and give yourself a pat on the back! With that simple spell, you've conjured up test cases with mocks! Explore the **keploy** directory and you'll discover your handiwork in the `tests` directory and `mocks.yml`.
 
 Want to see if everything works as expected?
 
