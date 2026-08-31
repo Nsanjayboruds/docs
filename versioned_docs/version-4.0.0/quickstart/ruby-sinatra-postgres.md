@@ -51,7 +51,7 @@ We will be using Docker Compose to run the application as well as PostgreSQL in 
 ### Clone the Application 🧪
 
 ```bash
-git clone https://github.com/Nsanjayboruds/keploy-ruby-postgresql-quickstart.git && cd keploy-ruby-postgresql-quickstart
+git clone https://github.com/keploy/samples-ruby.git && cd samples-ruby/sinatra-postgres-quickstart
 ```
 
 ![Ruby Docker setup](/img/ruby_postgres_docker_setup.png)
@@ -112,7 +112,7 @@ We'll be running our sample application locally on Linux/WSL using the workflow 
 ### Clone the Application 🧪
 
 ```bash
-git clone https://github.com/Nsanjayboruds/keploy-ruby-postgresql-quickstart.git && cd keploy-ruby-postgresql-quickstart
+git clone https://github.com/keploy/samples-ruby.git && cd samples-ruby/sinatra-postgres-quickstart
 ```
 
 ### Install Dependencies
