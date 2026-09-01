@@ -41,7 +41,7 @@ Microservice testing is the process of validating individual components of a mic
 ## Overcoming Challenges with Keploy
 
 Keploy is an innovative testing tool designed to address many of the challenges associated with microservices testing. Here's how it helps:
-<img src="https://keploy.io/docs/gif/record-replay.gif?raw=true"/>
+<img src="https://keploy.io/docs/gif/record-replay.gif?raw=true" alt="Keploy recording and replaying API calls across microservices"/>
 <br/>
 
 - **Automated Test Case Generation**: Keploy can generate test cases by recording your application's network calls. This automation significantly reduces the time and effort required to create comprehensive test suites.
@@ -52,3 +52,10 @@ Keploy is an innovative testing tool designed to address many of the challenges 
 - **Performance Testing**: The recorded interactions can be used to simulate realistic load scenarios, aiding in performance testing of microservices.
 
 By leveraging Keploy's capabilities, development teams can overcome many of the traditional challenges associated with microservices testing, leading to more robust and reliable distributed systems.
+
+## Related Terms
+
+- [Integration Testing](/docs/concepts/reference/glossary/integration-testing/) — verify how services interact together.
+- [End-to-End Testing](/docs/concepts/reference/glossary/end-to-end-testing/) — validate complete flows across microservices.
+- [Mocks](/docs/concepts/reference/glossary/mocks/) — simulate service dependencies during isolated tests.
+- [Browse all testing terms](/docs/concepts/reference/glossary/) — the full Keploy glossary.
